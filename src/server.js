@@ -1,8 +1,18 @@
 const express = require('express')
+const cors = require('cors')
 const pool = require('./config/db')
+const { requireAuth } = require('./middlewares/authMiddleware.js')
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+app.use(express.json());
+app.use(cors({
+    origin: 'http://localhost:3000'
+}))
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/items', require('./routes/itemRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 app.get('/api/health', async (req, res) => {
     try{
