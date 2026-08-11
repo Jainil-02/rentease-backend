@@ -21,10 +21,21 @@ async function login(req, res){
             return res.status(400).json({error: 'Email & Password are required'});
         }
         const result = await authService.loginUser({ email, password });
-        res.json(result);
+
+        res.cookie('token', result.token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7*24*60*60*1000,
+        });
+        res.json({user: result.user});
     } catch (err) {
         res.status(401).json({ error: err.message });
     }
 }
 
-module.exports = {register, login}
+async function me(req, res){
+    res.json({user: req.user});
+}
+
+module.exports = {register, login, me}
