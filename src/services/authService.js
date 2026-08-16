@@ -17,7 +17,15 @@ async function registerUser({name, email, password}){
         [name, email, passwordHash]
     );
 
-    return result.rows[0]
+    const user = result.rows[0]
+
+    const token = jwt.sign(
+        {userId: user.id, isAdmin: user.is_admin},
+        process.env.JWT_SECRET,
+        {expiresIn: process.env.JWT_EXPIRES_IN}
+    );
+
+    return {token, user}
 }
 
 async function loginUser({email, password}){

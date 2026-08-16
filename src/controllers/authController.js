@@ -7,7 +7,15 @@ async function register(req, res) {
             return res.status(400).json({error: 'Name, Email & Password are required'});
         }
 
-        const user = await authService.registerUser({ name, email, password});
+        const {token, user} = await authService.registerUser({ name, email, password});
+
+         res.cookie('token', result.token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7*24*60*60*1000,
+        });
+
         res.status(201).json({ user });
     } catch (err) {
         res.status(400).json({ error: err.message });
